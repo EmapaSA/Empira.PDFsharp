@@ -340,6 +340,24 @@ namespace PdfSharp.Drawing  // #??? aufräumen
 #endif
 
         /// <summary>
+        /// Marks beginning of graphic that is part of given OCG
+        /// After calling this method, everyting added to graphic will belong to the layer specified until it's waced off using the EndMarkedContent method
+        /// </summary>
+        /// <param name="layerName">Name of a layer</param>
+        public void BeginMarkedContentPropList(string layerName)
+        {
+            (this._renderer as XGraphicsPdfRenderer)?.BeginMarkedContentPropList(layerName);          
+        }
+
+        /// <summary>
+        /// Ends the current group started by method BeginMarkedContentPropList **EMAPA**
+        /// </summary>
+        public void EndMarkedContent()
+        {
+            (this._renderer as XGraphicsPdfRenderer)?.EndMarkedContent();
+        }
+
+        /// <summary>
         /// Initializes a new instance of the XGraphics class for drawing on a PDF page.
         /// </summary>
         XGraphics(PdfPage page, XGraphicsPdfPageOptions options, XGraphicsUnit pageUnit, XPageDirection pageDirection)

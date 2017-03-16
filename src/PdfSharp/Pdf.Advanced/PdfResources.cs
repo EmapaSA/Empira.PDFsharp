@@ -448,5 +448,107 @@ namespace PdfSharp.Pdf.Advanced
         {
             get { return Keys.Meta; }
         }
+
+
+        /// <summary>
+        /// Adds OCG to resources - allows to create layers in the PDF document
+        /// </summary>
+        /// <param name="layerName">name of layer</param>
+        /// <param name="layerCaption">Caption to be showed in pdf</param>
+        /// <param name="isOff">Should be off by default</param>
+        /// <returns></returns>
+        public string AddOCG(string layerName, string layerCaption, bool isOff = false)
+        {
+            ////Create layer
+            PdfDictionary layer = new PdfDictionary(_document);
+            layer.Elements.Add("/Name", new PdfString(layerCaption));
+            layer.Elements.Add("/Type", new PdfName("/OCG"));
+
+
+            PdfReference prp = new PdfReference(layer);
+            prp.Document = _document;
+            ////--//
+            string ln;
+            if (!this._resources.TryGetValue(layer, out ln))
+            {
+                Owner._irefTable.Add(layer);
+                Properties.Elements["/" + layerName] = layer.Reference;
+
+                ln = layerName;
+            }
+
+            ////Try get /OCProperties
+            PdfDictionary ocProperties;
+            if (_document.Catalog.Elements.ContainsKey("/OCProperties"))
+            {
+                ocProperties = (PdfDictionary)_document.Catalog.Elements["/OCProperties"];
+            }
+            else
+            {
+                ocProperties = new PdfDictionary(_document);
+                _document.Catalog.Elements.Add("/OCProperties", ocProperties);
+            }
+            ////--//
+
+            ////Try get /OCGs and add layer
+            PdfArray oCGs;
+            if (ocProperties.Elements.ContainsKey("/OCGs"))
+            {
+                oCGs = (PdfArray)ocProperties.Elements["/OCGs"];
+            }
+            else
+            {
+                oCGs = new PdfArray(_document);
+                ocProperties.Elements.Add("/OCGs", oCGs);
+            }
+            oCGs.Elements.Add(layer);
+            ////--//
+
+            ////Try get /D
+            PdfDictionary d;
+            if (ocProperties.Elements.ContainsKey("/D"))
+            {
+                d = (PdfDictionary)ocProperties.Elements["/D"];
+            }
+            else
+            {
+                d = new PdfDictionary(_document);
+                ocProperties.Elements.Add("/D", d);
+            }
+            ////--//
+
+            ////Try get /Order add layer
+            PdfArray order;
+            if (d.Elements.ContainsKey("/Order"))
+            {
+                order = (PdfArray)d.Elements["/Order"];
+            }
+            else
+            {
+                order = new PdfArray(_document);
+                d.Elements.Add("/Order", order);
+            }
+            order.Elements.Add(layer);
+            ////--//
+
+            ////Try get /OFF and add layer if needed
+            PdfArray off;
+            if (d.Elements.ContainsKey("/OFF"))
+            {
+                off = (PdfArray)d.Elements["/OFF"];
+            }
+            else
+            {
+                off = new PdfArray(_document);
+                d.Elements.Add("/OFF", off);
+            }
+            if (isOff)
+                off.Elements.Add(layer);
+            ////--//
+
+
+
+            return ln;
+        }
     }
 }

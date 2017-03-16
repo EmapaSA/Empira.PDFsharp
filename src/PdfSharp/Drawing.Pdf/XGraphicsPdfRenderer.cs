@@ -2099,5 +2099,24 @@ namespace PdfSharp.Drawing.Pdf
         /// The final transformation from the world space to the default page space.
         /// </summary>
         public XMatrix DefaultViewMatrix;
+
+
+
+        /// <summary>
+        /// Injects the layer name start markers
+        /// </summary>
+        /// <param name="layerName"></param>
+        public void BeginMarkedContentPropList(string layerName)
+        {
+            this._content.Append(" /OC /" + layerName + " BDC ");
+        }
+
+        /// <summary>
+        /// injects the layer end markers
+        /// </summary>
+        public void EndMarkedContent()
+        {
+            this._content.Append(" EMC ");
+        }
     }
 }
